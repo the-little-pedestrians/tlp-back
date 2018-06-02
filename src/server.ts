@@ -11,6 +11,7 @@ import { config } from 'dotenv'
 import * as cors from 'cors'
 import * as logger from 'morgan'
 import * as io from 'socket.io'
+import { createPool, Pool } from 'mysql'
 
 config()
 
@@ -19,9 +20,10 @@ import { schema } from './graphql'
 
 export class Server {
   public app: express.Application
+  public mysql: Pool
   private io: io.Server
   private server: httpServer
-  public transporter: Transporter
+  private transporter: Transporter
   private isProduction: boolean = process.env.NODE_ENV === 'production'
   private isDevelopement: boolean = process.env.NODE_ENV === 'developement'
   private secret: string = process.env.SESSION_SECRET
@@ -47,6 +49,17 @@ export class Server {
       connect(process.env.MONGODB_URI)
     } catch (e) {
       createConnection(process.env.MONGODB_URI)
+    }
+
+    try {
+      this.mysql = createPool({
+        host     : process.env.MYSQL_HOST,
+        user     : process.env.MYSQL_USERNAME,
+        password : process.env.MYSQL_PASSWORD,
+        database : process.env.MYSQL_DATABASE
+      })
+    } catch (e) {
+      console.error('Couldnt connect to gcp mysql')
     }
 
     this.app.set('port', process.env.PORT || 3000)

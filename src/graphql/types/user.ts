@@ -8,6 +8,7 @@ import {
 } from 'graphql'
 
 import { getAll, getById, create, logIn, update } from '../resolvers/user.resolver'
+import { movieType } from './movie';
 
 export const userType = new GraphQLObjectType({
   name: 'User',
@@ -44,6 +45,14 @@ export const userType = new GraphQLObjectType({
     token: {
       type: GraphQLString,
       description: 'Token used to authenticate requests'
+    },
+    movies_liked: {
+      type: new GraphQLList(movieType),
+      description: 'Movies the user liked'
+    },
+    movies_disliked: {
+      type: new GraphQLList(movieType),
+      description: 'Movies the user disliked'
     }
   })
 })

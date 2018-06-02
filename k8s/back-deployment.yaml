@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.13.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: back
+  name: back
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: back
+    spec:
+      containers:
+      - env:
+        - name: EMAIL_HOST
+          value: mailcatcher
+        - name: EMAIL_PORT
+          value: "25"
+        - name: MONGODB_URI
+          value: mongodb://mongo:27017/test
+        - name: NODE_ENV
+          value: production
+        image: gcr.io/thelittlepedestrians-206020/tlp-back
+        name: back
+        ports:
+        - containerPort: 3000
+        resources: {}
+      restartPolicy: Always
+status: {}

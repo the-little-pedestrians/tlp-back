@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.13.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: front
+  name: front
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: front
+    spec:
+      containers:
+      - env:
+        - name: SERVER_HOST
+          value: back
+        - name: SERVER_PORT
+          value: "3333"
+        image: gcr.io/thelittlepedestrians-206020/tlp-front
+        name: front
+        ports:
+        - containerPort: 80
+        resources: {}
+      restartPolicy: Always
+status: {}

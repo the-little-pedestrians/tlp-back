@@ -45,6 +45,11 @@
                 Boolean
             </a>
         </li>
+        <li  title="Float">
+            <a href="float.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Float
+            </a>
+        </li>
         <li  title="Int">
             <a href="int.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
                 Int
@@ -75,6 +80,11 @@
 <div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
     <h4 class="slds-text-title--caps slds-p-around--medium">Objects</h4>
     <ul>
+        <li  title="Movie">
+            <a href="movie.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Movie
+            </a>
+        </li>
         <li  title="User">
             <a href="user.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
                 User
@@ -163,7 +173,7 @@
             </a>
             GraphQL Schema definition
         </h2>
-        <code class="highlight"><ul class="code" style="padding-left:42px"><li><span class="keyword operator ts">type</span> <span class="identifier">Query</span> {</li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>limit</strong>: limit items in the results</span></span></li><li><span class="tab"><span class="meta">users</span>(<span class="meta">limit</span>: <a class="support type" href="int.doc.html">Int</a>): [<a class="support type" href="user.doc.html">User</a>] </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>id</strong>: find by id</span></span></li><li><span class="tab"><span class="meta">userById</span>(<span class="meta">id</span>: <a class="support type" href="string.doc.html">String</a>): <a class="support type" href="user.doc.html">User</a> </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>email</strong>: email</span></span></li><li><span class="tab"><span class="comment line">#   <strong>password</strong>: password</span></span></li><li><span class="tab"><span class="meta">logIn</span>(<span class="meta">email</span>: <a class="support type" href="string.doc.html">String</a>, <span class="meta">password</span>: <a class="support type" href="string.doc.html">String</a>): <a class="support type" href="user.doc.html">User</a> </span></li><li>}</li></ul></code>
+        <code class="highlight"><ul class="code" style="padding-left:42px"><li><span class="keyword operator ts">type</span> <span class="identifier">Query</span> {</li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>limit</strong>: limit items in the results</span></span></li><li><span class="tab"><span class="meta">users</span>(<span class="meta">limit</span>: <a class="support type" href="int.doc.html">Int</a>): [<a class="support type" href="user.doc.html">User</a>] </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>id</strong>: find by id</span></span></li><li><span class="tab"><span class="meta">userById</span>(<span class="meta">id</span>: <a class="support type" href="string.doc.html">String</a>): <a class="support type" href="user.doc.html">User</a> </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>email</strong>: email</span></span></li><li><span class="tab"><span class="comment line">#   <strong>password</strong>: password</span></span></li><li><span class="tab"><span class="meta">logIn</span>(<span class="meta">email</span>: <a class="support type" href="string.doc.html">String</a>, <span class="meta">password</span>: <a class="support type" href="string.doc.html">String</a>): <a class="support type" href="user.doc.html">User</a> </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>limit</strong>: limit items in the results</span></span></li><li><span class="tab"><span class="meta">movies</span>(<span class="meta">limit</span>: <a class="support type" href="int.doc.html">Int</a>): [<a class="support type" href="movie.doc.html">Movie</a>] </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>id</strong>: find by id</span></span></li><li><span class="tab"><span class="meta">movieById</span>(<span class="meta">id</span>: <a class="support type" href="string.doc.html">String</a>): <a class="support type" href="movie.doc.html">Movie</a> </span></li><li></li><li><span class="tab"><span class="comment line"># Arguments</span></span></li><li><span class="tab"><span class="comment line">#   <strong>limit</strong>: limit items in the result</span></span></li><li><span class="tab"><span class="meta">getInitMovies</span>(<span class="meta">limit</span>: <a class="support type" href="int.doc.html">Int</a>): [<a class="support type" href="movie.doc.html">Movie</a>] </span></li><li>}</li></ul></code>
     </div>
 </section>
 <section>

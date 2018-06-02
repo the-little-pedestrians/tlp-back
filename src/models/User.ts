@@ -34,7 +34,13 @@ const UserSchema = new Schema(
     balance: {
       type: Number,
       default: 0
-    }
+    },
+    movies_liked: [
+      { type: Schema.Types.ObjectId, ref: 'Movie', default: [] }
+    ],
+    movies_disliked: [
+      { type: Schema.Types.ObjectId, ref: 'Movie', default: [] }
+    ],
   },
   { timestamps: true }
 )

@@ -45,6 +45,11 @@
                 Boolean
             </a>
         </li>
+        <li  title="Float">
+            <a href="float.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Float
+            </a>
+        </li>
         <li  title="Int">
             <a href="int.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
                 Int
@@ -75,6 +80,11 @@
 <div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
     <h4 class="slds-text-title--caps slds-p-around--medium">Objects</h4>
     <ul>
+        <li  title="Movie">
+            <a href="movie.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Movie
+            </a>
+        </li>
         <li class="slds-is-active" title="User">
             <a href="user.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
                 User
@@ -164,7 +174,7 @@
             </a>
             GraphQL Schema definition
         </h2>
-        <code class="highlight"><ul class="code" style="padding-left:42px"><li><span class="keyword operator ts">type</span> <span class="identifier">User</span> {</li><li></li><li><span class="tab"><span class="comment line">#   The id</span></span></li><li><span class="tab"><span class="meta">_id</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The email</span></span></li><li><span class="tab"><span class="meta">email</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The firstname</span></span></li><li><span class="tab"><span class="meta">firstname</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The lastname</span></span></li><li><span class="tab"><span class="meta">lastname</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The image/avatar</span></span></li><li><span class="tab"><span class="meta">image</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Is account validated</span></span></li><li><span class="tab"><span class="meta">isValidated</span>: <a class="support type" href="boolean.doc.html">Boolean</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Total tokens</span></span></li><li><span class="tab"><span class="meta">balance</span>: <a class="support type" href="int.doc.html">Int</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Token used to authenticate requests</span></span></li><li><span class="tab"><span class="meta">token</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li>}</li></ul></code>
+        <code class="highlight"><ul class="code" style="padding-left:42px"><li><span class="keyword operator ts">type</span> <span class="identifier">User</span> {</li><li></li><li><span class="tab"><span class="comment line">#   The id</span></span></li><li><span class="tab"><span class="meta">_id</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The email</span></span></li><li><span class="tab"><span class="meta">email</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The firstname</span></span></li><li><span class="tab"><span class="meta">firstname</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The lastname</span></span></li><li><span class="tab"><span class="meta">lastname</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   The image/avatar</span></span></li><li><span class="tab"><span class="meta">image</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Is account validated</span></span></li><li><span class="tab"><span class="meta">isValidated</span>: <a class="support type" href="boolean.doc.html">Boolean</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Total tokens</span></span></li><li><span class="tab"><span class="meta">balance</span>: <a class="support type" href="int.doc.html">Int</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Token used to authenticate requests</span></span></li><li><span class="tab"><span class="meta">token</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   Movies the user liked</span></span></li><li><span class="tab"><span class="meta">movies_liked</span>: [<a class="support type" href="movie.doc.html">Movie</a>] </span></li><li></li><li><span class="tab"><span class="comment line">#   Movies the user disliked</span></span></li><li><span class="tab"><span class="meta">movies_disliked</span>: [<a class="support type" href="movie.doc.html">Movie</a>] </span></li><li>}</li></ul></code>
     </div>
 </section>
 <section>

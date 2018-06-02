@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="./styles/graphdoc.css" />
-    <title>__Directive</title>
+    <title>Float</title>
     <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700" rel="stylesheet"><link type="text/css" rel="stylesheet" href="./assets/code.css" /><link type="text/css" rel="stylesheet" href="./assets/require-by.css" />
 </head>
 <body class="slds-scrollable--y">
@@ -45,7 +45,7 @@
                 Boolean
             </a>
         </li>
-        <li  title="Float">
+        <li class="slds-is-active" title="Float">
             <a href="float.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
                 Float
             </a>
@@ -90,7 +90,7 @@
                 User
             </a>
         </li>
-        <li class="slds-is-active" title="__Directive">
+        <li  title="__Directive">
             <a href="directive.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
                 __Directive
             </a>
@@ -160,10 +160,9 @@
         </div>
     </div>
     <div class="container">
-        <p class="slds-text-title--caps slds-text-color--weak">OBJECT</p>
-        <h1 class="slds-text-heading--large">__Directive</h1>
-        <div class="slds-text-body--regular"><p>A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.</p>
-<p>In some cases, you need to provide options to alter GraphQL&#39;s execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor.</p>
+        <p class="slds-text-title--caps slds-text-color--weak">SCALAR</p>
+        <h1 class="slds-text-heading--large">Float</h1>
+        <div class="slds-text-body--regular"><p>The <code>Float</code> scalar type represents signed double-precision fractional values as specified by <a href="http://en.wikipedia.org/wiki/IEEE_floating_point">IEEE 754</a>. </p>
 </div>
     </div>
 </section>
@@ -175,7 +174,7 @@
             </a>
             GraphQL Schema definition
         </h2>
-        <code class="highlight"><ul class="code" style="padding-left:42px"><li><span class="keyword operator ts">type</span> <span class="identifier">__Directive</span> {</li><li></li><li><span class="tab"><span class="meta">name</span>: <a class="support type" href="string.doc.html">String</a>! </span></li><li></li><li><span class="tab"><span class="meta">description</span>: <a class="support type" href="string.doc.html">String</a> </span></li><li></li><li><span class="tab"><span class="meta">locations</span>: [<a class="support type" href="directivelocation.spec.html">__DirectiveLocation</a>!]! </span></li><li></li><li><span class="tab"><span class="meta">args</span>: [<a class="support type" href="inputvalue.spec.html">__InputValue</a>!]! </span></li><li></li><li><span class="tab"><span class="meta">onOperation</span>: <a class="support type" href="boolean.doc.html">Boolean</a>! <span class="keyword operator ts">@deprecated</span>( reason: <span class="string">"Use `locations`." </span> )</span></li><li></li><li><span class="tab"><span class="meta">onFragment</span>: <a class="support type" href="boolean.doc.html">Boolean</a>! <span class="keyword operator ts">@deprecated</span>( reason: <span class="string">"Use `locations`." </span> )</span></li><li></li><li><span class="tab"><span class="meta">onField</span>: <a class="support type" href="boolean.doc.html">Boolean</a>! <span class="keyword operator ts">@deprecated</span>( reason: <span class="string">"Use `locations`." </span> )</span></li><li>}</li></ul></code>
+        <code class="highlight"><ul class="code" style="padding-left:28px"><li><span class="keyword operator ts">scalar</span> <span class="identifier">Float</span></li></ul></code>
     </div>
 </section>
 <section>
@@ -186,7 +185,7 @@
             </a>
             Require by
         </h2>
-        <ul class="require-by"><li><a href="schema.spec.html" title="__Schema - A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.">__Schema<em>A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.</em></a><li></ul>
+        <ul class="require-by"><li><a href="movie.doc.html" title="Movie - Movie type">Movie<em>Movie type</em></a><li></ul>
     </div>
 </section>
 <footer>
