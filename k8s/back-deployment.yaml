@@ -19,12 +19,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: EMAIL_HOST
-          value: mailcatcher
-        - name: EMAIL_PORT
-          value: "25"
-        - name: MONGODB_URI
-          value: mongodb://mongo:27017/test
         - name: NODE_ENV
           value: production
         image: gcr.io/thelittlepedestrians-206020/tlp-back

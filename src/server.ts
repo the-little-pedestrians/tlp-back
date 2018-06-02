@@ -46,9 +46,9 @@ export class Server {
   private config() {
     try {
       if (this.isDevelopement) set('debug', true)
-      connect(process.env.MONGODB_URI)
+      connect(`mongodb://${process.env.MONGO_SERVICE_HOST}:${process.env.MONGO_SERVICE_PORT}/tlp-db`)
     } catch (e) {
-      createConnection(process.env.MONGODB_URI)
+      createConnection(`mongodb://${process.env.MONGO_SERVICE_HOST}:${process.env.MONGO_SERVICE_PORT}/tlp-db`)
     }
 
     try {
