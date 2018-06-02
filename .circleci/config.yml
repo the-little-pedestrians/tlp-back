@@ -1,0 +1,70 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+dependencies:
+  pre:
+    - sudo pip install docker-compose
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Lint
+          command: docker-compose run -p 3000 --rm integrationtests yarn lint
+      - run:
+          name: Integrations tests
+          command: docker-compose run -p 3000 --rm integrationtests yarn test:ci
+          volumes:
+            - $CIRCLE_TEST_REPORTS/junit:/tmp/app/reports/junit
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+      - run:
+          name: Publish code coverage
+          command: sudo pip install codecov && codecov -f ./coverage/coverage-final.json -t $CODECOV_TOKEN
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
+      - run:
+          name: Push to docker hub
+          environment:
+            IMAGE: socialementcompetents/socoback
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ -n "${CIRCLE_TAG}" ] || [ "${CIRCLE_BRANCH}" == "feat/heroku" ]; then
+              docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+              docker build \
+                -t $IMAGE \
+                -f production.Dockerfile \
+                --build-arg MONGODB_URI=mongodb://$MONGO_USER:$MONGO_PASSWORD@$MONGO_HOST .          
+              docker tag ${IMAGE}:latest ${IMAGE}:${CIRCLE_SHA1}
+              docker push ${IMAGE}:${CIRCLE_SHA1}
+              docker push ${IMAGE}:latest
+            fi
+            if [ -n "${CIRCLE_TAG}" ]; then
+              docker tag ${IMAGE}:latest ${IMAGE}:${CIRCLE_TAG}
+              docker push ${IMAGE}:${CIRCLE_TAG}
+            fi
+      - run:
+          name: Push to Heroku if tag or master branch
+          environment:
+            IMAGE: socialementcompetents/socoback:latest
+            HEROKU_REGISTRY: registry.heroku.com 
+            HEROKU_IMAGE: soco-back/web:latest
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ -n "${CIRCLE_TAG}" ] || [ "${CIRCLE_BRANCH}" == "feat/heroku" ]; then
+              docker login -u=_ -p=$HEROKU_API_KEY registry.heroku.com
+              docker tag $IMAGE $HEROKU_REGISTRY/$HEROKU_IMAGE
+              docker push $HEROKU_REGISTRY/$HEROKU_IMAGE
+            fi
+
+workflows:
+  version: 2
+  test_build:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
