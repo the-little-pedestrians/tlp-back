@@ -1,0 +1,385 @@
+version: 2
+
+gcloud_deployer: &gcloud_deployer
+    docker:
+        - image: google/cloud-sdk:latest
+    working_directory: /go/src/bitbucket.org/workhearth/workhearth
+
+gcloud_deployer_steps:
+    - &gc_step1_attach_ws
+        attach_workspace:
+            at: /go/src/bitbucket.org/workhearth/workhearth
+    - &gc_step2_install_docker
+        run:
+            name: Install Docker
+            command: |
+                set -x
+                VER="17.03.0-ce"
+                curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+                tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+                mv -f /tmp/docker/* /usr/bin
+
+    - &gc_step3_setup_docker_engine
+        type: setup-docker-engine
+
+    - &gc_step4_init_gcloud_sdk
+        run:
+            name: Init the gcloud SDK
+            command: |
+                echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
+                gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
+                gcloud config set project ${GOOGLE_PROJECT_ID}
+                gcloud config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+                gcloud container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+
+    - &gc_step5_prepare_creds_file
+        run:
+            name: Prepare the GCloud Application Creds file
+            command: echo ${GOOGLE_APPLICATION_CREDENTIALS} > ${SERVICE_FOLDER}/Workhearth.json
+
+    - &gc_step6_build_docker_image
+        run:
+            name: Build the Docker image
+            command: > 
+                cd ${SERVICE_FOLDER} && docker build -t gcr.io/${GOOGLE_PROJECT_ID}/${IMAGE_NAME}:latest
+                --build-arg CIRCLECI_BUILD_NUMBER=${CIRCLE_BUILD_NUM} .
+
+    - &gc_step7_push_registry
+        run:
+            name: Push the image to google registry
+            command: gcloud docker -- push gcr.io/${GOOGLE_PROJECT_ID}/${IMAGE_NAME}:latest
+
+    - &gc_step8_apply
+        run:
+            name: Apply the deployment to the gke cluster
+            command: kubectl apply -f ${SERVICE_FOLDER}/k8s
+
+    - &gc_step9_force_pull_image
+        run:
+            name: Force pull the newer image
+            command: kubectl patch deployment ${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
+
+golang_tester: &golang_tester
+    docker:
+        - image: circleci/golang:1.8
+    working_directory: /go/src/bitbucket.org/workhearth/workhearth
+
+node_tester: &node_tester
+    docker:
+        - image: circleci/node:latest
+
+jobs:
+    create_base_env:
+        <<: *golang_tester
+        steps:
+            # Is that step necessary ?
+            - run:
+                name: "Remove image's folder"
+                command: rm -fR /go/src/bitbucket.org/workhearth/workhearth
+
+            - attach_workspace:
+                at: /go/src/bitbucket.org/workhearth/workhearth
+
+            - checkout
+
+            - run:
+                name: Give execute permission to run_if_changed.sh
+                command: chmod +x ./.circleci/run_if_changed.sh
+
+            - persist_to_workspace:
+                root: .
+                paths:
+                    - "*"
+
+    # ui frontend
+    ui:
+        <<: *node_tester
+        steps:
+            - checkout
+
+            - restore_cache:
+                keys:
+                    - v3-dependencies-{{ checksum "ui/client/package.json" }}
+
+            - run:
+                name: Give execute permission to run_if_changed.sh
+                command: chmod +x ./.circleci/run_if_changed.sh
+
+            - run:
+                name: Install dependencies
+                command: ./.circleci/run_if_changed.sh ui/client "cd ui/client && yarn"
+
+            - save_cache:
+                paths:
+                    - ui/client/node_modules
+                key: v3-dependencies-{{ checksum "ui/client/package.json" }}
+
+            - run:
+                name: Test the client
+                command: ./.circleci/run_if_changed.sh ui/client "cd ui/client && yarn lint && yarn unit && yarn ccov"
+
+    # ui backend
+    backend:
+        <<: *golang_tester
+        steps:
+            - attach_workspace:
+                at: /go/src/bitbucket.org/workhearth/workhearth
+
+            - restore_cache:
+                keys:
+                    - v3-dependencies-{{ checksum "ui/server/Gopkg.lock" }}
+
+            - run:
+                name: Use golang/dep to verify the dependencies
+                command: ./.circleci/run_if_changed.sh ui/server "cd ui/server && go get -u github.com/golang/dep/cmd/dep && dep ensure"
+
+            - save_cache:
+                paths:
+                    - ui/server/vendor
+                key: v3-dependencies-{{ checksum "ui/server/Gopkg.lock" }}
+
+            - run:
+                name: Build the server
+                environment:
+                    GOOS: "linux"
+                    GOARCH: "amd64"
+                    CGO_ENABLED: "0"
+                command: ./.circleci/run_if_changed.sh ui/server "cd ui/server && go build"
+
+    mastersvc:
+        <<: *golang_tester
+        steps:
+            - attach_workspace:
+                at: /go/src/bitbucket.org/workhearth/workhearth
+
+            - restore_cache:
+                keys:
+                    - v3-dependencies-{{ checksum "mastersvc/Gopkg.lock" }}
+
+            - run:
+                name: Use golang/dep to verify the dependencies
+                command: ./.circleci/run_if_changed.sh mastersvc "cd mastersvc && go get -u github.com/golang/dep/cmd/dep && dep ensure"
+
+            - save_cache:
+                paths:
+                    - mastersvc/vendor
+                key: v3-dependencies-{{ checksum "mastersvc/Gopkg.lock" }}
+
+            - run:
+                name: Build the mastersvc
+                environment:
+                    GOOS: "linux"
+                    GOARCH: "amd64"
+                    CGO_ENABLED: "0"
+                command: ./.circleci/run_if_changed.sh mastersvc "cd mastersvc && go build"
+
+    dbsvc:
+        <<: *golang_tester
+        steps:
+            - attach_workspace:
+                at: /go/src/bitbucket.org/workhearth/workhearth
+
+            - restore_cache:
+                keys:
+                    - v3-dependencies-{{ checksum "dbsvc/Gopkg.lock" }}
+
+            - run:
+                name: Use golang/dep to verify the dependencies
+                command: ./.circleci/run_if_changed.sh dbsvc "cd dbsvc && go get -u github.com/golang/dep/cmd/dep && dep ensure"
+
+            - save_cache:
+                paths:
+                    - dbsvc/vendor
+                key: v3-dependencies-{{ checksum "dbsvc/Gopkg.lock" }}
+
+            - run:
+                name: Build the dbsvc
+                environment:
+                    GOOS: "linux"
+                    GOARCH: "amd64"
+                    CGO_ENABLED: "0"
+                command: ./.circleci/run_if_changed.sh dbsvc "cd dbsvc && go build"
+
+    mailsvc:
+        <<: *golang_tester
+        steps:
+            - attach_workspace:
+                at: /go/src/bitbucket.org/workhearth/workhearth
+
+            - restore_cache:
+                keys:
+                    - v3-dependencies-{{ checksum "mailsvc/Gopkg.lock" }}
+
+            - run:
+                name: Use golang/dep to verify the dependencies
+                command: ./.circleci/run_if_changed.sh mailsvc "cd mailsvc && go get -u github.com/golang/dep/cmd/dep && dep ensure"
+
+            - save_cache:
+                paths:
+                    - mailsvc/vendor
+                key: v3-dependencies-{{ checksum "mailsvc/Gopkg.lock" }}
+
+            - run:
+                name: Build the mailsvc
+                environment:
+                    GOOS: "linux"
+                    GOARCH: "amd64"
+                    CGO_ENABLED: "0"
+                command: ./.circleci/run_if_changed.sh mailsvc "cd mailsvc && go build"
+
+
+    deploy_ui:
+        <<: *gcloud_deployer
+        environment:
+            SERVICE_FOLDER: ui
+            DEPLOYMENT_NAME: ui
+            IMAGE_NAME: ui
+        steps:
+            - *gc_step1_attach_ws
+            - *gc_step2_install_docker
+            - *gc_step3_setup_docker_engine
+            - *gc_step4_init_gcloud_sdk
+            - *gc_step5_prepare_creds_file
+            - *gc_step6_build_docker_image
+            - *gc_step7_push_registry
+            - *gc_step8_apply
+            - *gc_step9_force_pull_image
+
+
+    deploy_mastersvc:
+        <<: *gcloud_deployer
+        environment:
+            SERVICE_FOLDER: mastersvc
+            DEPLOYMENT_NAME: mastersvc
+            IMAGE_NAME: mastersvc
+        steps:
+            - *gc_step1_attach_ws
+            - *gc_step2_install_docker
+            - *gc_step3_setup_docker_engine
+            - *gc_step4_init_gcloud_sdk
+            - *gc_step5_prepare_creds_file
+            - *gc_step6_build_docker_image
+            - *gc_step7_push_registry
+            - *gc_step8_apply
+            - *gc_step9_force_pull_image            
+
+
+    deploy_dbsvc:
+        <<: *gcloud_deployer
+        environment:
+            SERVICE_FOLDER: dbsvc
+            DEPLOYMENT_NAME: dbsvc
+            IMAGE_NAME: dbsvc
+        steps:
+            - *gc_step1_attach_ws
+            - *gc_step2_install_docker
+            - *gc_step3_setup_docker_engine
+            - *gc_step4_init_gcloud_sdk
+            - *gc_step5_prepare_creds_file
+            - *gc_step6_build_docker_image
+            - *gc_step7_push_registry
+            - *gc_step8_apply
+            - *gc_step9_force_pull_image
+
+
+    deploy_mailsvc:
+        <<: *gcloud_deployer
+        environment:
+            SERVICE_FOLDER: mailsvc
+            DEPLOYMENT_NAME: mailsvc
+            IMAGE_NAME: mailsvc
+        steps:
+            - *gc_step1_attach_ws
+            - *gc_step2_install_docker
+            - *gc_step3_setup_docker_engine
+            - *gc_step4_init_gcloud_sdk
+            - *gc_step5_prepare_creds_file
+            - *gc_step6_build_docker_image
+            - *gc_step7_push_registry
+            - *gc_step8_apply
+            - *gc_step9_force_pull_image
+
+
+    deploy_godoc:
+        <<: *gcloud_deployer
+        environment:
+            SERVICE_FOLDER: godoc
+            DEPLOYMENT_NAME: godoc
+            IMAGE_NAME: godoc
+        steps:
+            - *gc_step1_attach_ws
+            - *gc_step2_install_docker
+            - *gc_step3_setup_docker_engine
+            - *gc_step4_init_gcloud_sdk
+            - *gc_step6_build_docker_image
+            - *gc_step7_push_registry
+            - *gc_step8_apply
+            - *gc_step9_force_pull_image
+
+
+    deploy_infra:
+        <<: *gcloud_deployer
+        environment:
+            SERVICE_FOLDER: infra
+        steps:
+            - *gc_step1_attach_ws
+            - *gc_step4_init_gcloud_sdk
+            - *gc_step8_apply
+
+workflows:
+    version: 2
+    test_build_and_deploy:
+        jobs:
+            - create_base_env
+            - ui:
+                requires:
+                    - create_base_env
+            - backend:
+                requires:
+                    - create_base_env
+            - mastersvc:
+                requires:
+                    - create_base_env
+            - dbsvc:
+                requires:
+                    - create_base_env
+            - mailsvc:
+                requires:
+                    - create_base_env
+            - deploy_ui:
+                requires:
+                    - backend
+                    - ui
+                filters:
+                    branches:
+                        only: master
+            - deploy_mastersvc:
+                requires:
+                    - mastersvc
+                filters:
+                    branches:
+                        only: master
+            - deploy_dbsvc:
+                requires:
+                    - dbsvc
+                filters:
+                    branches:
+                        only: master
+            - deploy_mailsvc:
+                requires:
+                    - mailsvc
+                filters:
+                    branches:
+                        only: master
+            - deploy_godoc:
+                requires:
+                    - create_base_env
+                filters:
+                    branches:
+                        only: master
+            - deploy_infra:
+                requires:
+                    - create_base_env
+                filters:
+                    branches:
+                        only: master
