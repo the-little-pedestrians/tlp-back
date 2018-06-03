@@ -28,13 +28,15 @@ const UserSchema = new Schema(
     image: {
       type: String
     },
+    age: {
+      type: Number
+    },
+    gender: {
+      type: String
+    },
     hash: String,
     salt: String,
     isValidated: Boolean,
-    balance: {
-      type: Number,
-      default: 0
-    },
     movies_liked: [
       { type: Schema.Types.ObjectId, ref: 'Movie', default: [] }
     ],
@@ -111,7 +113,8 @@ export interface IUser extends Document {
   token?: string
   fullname?: string
   isValidated: boolean
-  balance: number
+  age: number
+  gender: string
   toProfileJSONFor: (user: IUser) => IUser
   toAuthJSON: () => IUser
   generateJWT: () => string

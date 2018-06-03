@@ -33,9 +33,11 @@ export async function logIn(email: string, password: string) {
 export async function create(
   email: string,
   password: string,
-  firstname: string,
-  lastname: string,
-  image?: string
+  gender: string,
+  age: number,
+  firstname?: string,
+  lastname?: string,
+  image?: string,
 ) {
   try {
     const user = new User()
@@ -43,6 +45,8 @@ export async function create(
     user.firstname = firstname
     user.lastname = lastname
     user.image = image
+    user.gender = gender
+    user.age = age
     user.setPassword(password)
 
     const saved = await user.save()

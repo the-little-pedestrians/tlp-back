@@ -34,13 +34,17 @@ export const userType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'The image/avatar'
     },
+    gender: {
+      type: GraphQLString,
+      description: 'The gender'
+    },
+    age: {
+      type: GraphQLInt,
+      description: 'The age'
+    },
     isValidated: {
       type: GraphQLBoolean,
       description: 'Is account validated'
-    },
-    balance: {
-      type: GraphQLInt,
-      description: 'Total tokens'
     },
     token: {
       type: GraphQLString,
