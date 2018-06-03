@@ -10,10 +10,10 @@ metadata:
   name: back
 spec:
   ports:
-  - name: "3333"
-    port: 3333
+  - name: "80"
+    port: 80
     targetPort: 3000
   selector:
     io.kompose.service: back
-status:
-  loadBalancer: {}
+  type: LoadBalancer
+  loadBalancerIP: "146.148.29.144"
