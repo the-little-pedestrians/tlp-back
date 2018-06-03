@@ -21,6 +21,8 @@ spec:
       - env:
         - name: NODE_ENV
           value: production
+        - name: MYSQL_HOST
+          value: "104.155.78.44"
         image: gcr.io/thelittlepedestrians-206020/tlp-back
         name: back
         ports:
